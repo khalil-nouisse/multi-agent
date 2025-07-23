@@ -1,2 +1,3 @@
 .env
 venv/
+graph/__pycache__

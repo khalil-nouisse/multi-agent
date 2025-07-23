@@ -5,5 +5,10 @@
 
 from typing import Annotated, List, Tuple, Union
 from langchain.tools import BaseTool, StructuredTool, Tool
-from langchain_core.tools import tool
+from tools.customer_tools import customer_tool_list
+from config import llm
+from graph.agents_factory import create_agent
 
+tools = customer_tool_list
+customer_system_prompt = "you are ..."
+customer_agent = create_agent(llm, tools, customer_system_prompt)

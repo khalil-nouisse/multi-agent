@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from config import llm 
 
 
-members = ["customer", "sales" , "tech_support"]
+members = ["customer_support", "sales_manager" , "tachnical_support"]
 system_prompt = (
     "You are a supervisor tasked with managing a conversation between the"
     " following workers:  {members}. Given the following user request,"

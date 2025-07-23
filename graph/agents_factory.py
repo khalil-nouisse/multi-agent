@@ -1,7 +1,10 @@
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langsmith import traceable
 
+@traceable(name="create_agent")
 def create_agent(llm: ChatOpenAI, tools: list, system_prompt: str):
     # Each worker node will be given a name and some tools.
     prompt = ChatPromptTemplate.from_messages(
