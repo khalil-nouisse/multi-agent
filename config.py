@@ -5,7 +5,7 @@ import os
 from langchain_openai import ChatOpenAI
 
 
-llm = ChatOpenAI(model="gpt-3.5-turbo")
+llm = ChatOpenAI(model="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY"))
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")

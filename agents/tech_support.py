@@ -14,5 +14,5 @@ from graph.agents_factory import create_agent
 
 # Tools for the technical support agent
 tools = tech_tool_list
-tech_system_prompt = "you are ..."
+tech_system_prompt = "you are the technical support manager "
 tech_support_agent = create_agent(llm, tools, tech_system_prompt)

@@ -11,7 +11,7 @@ from databse import get_status
 def ticket_state(title: str):
     """Provide information about the state of the ticket of the client from the database."""
     state = get_status(title , "ticket")
-    return state
+    return "DONE"
 
 
 @tool("ClientHistory", return_direct=True)

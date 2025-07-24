@@ -30,11 +30,10 @@ def create_agent(llm: ChatOpenAI, tools: list, system_prompt: str):
 
 # agent node
 def agent_node(state, agent, name):
-    
     result = agent.invoke(state)
-
     output = result.get("output")
     if not isinstance(output, str):
         output = "Sorry, I couldn’t generate a response."
-
-    return {"messages": [HumanMessage(content=output, name=name)]}
+    # Append the new message to the existing messages
+    messages = list(state["messages"]) + [HumanMessage(content=output, name=name)]
+    return {**state, "messages": messages}

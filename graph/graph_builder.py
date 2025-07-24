@@ -12,7 +12,7 @@ from langchain_core.messages import BaseMessage
 from agents.sales import sales_agent
 from agents.customer import customer_agent
 from agents.tech_support import tech_support_agent
-from agents.supervisor import supervisor_chain
+from agents.supervisor import supervisor_node , supervisor_chain
 
 from graph.agents_factory import agent_node
 
@@ -64,7 +64,7 @@ def build_graph() -> Runnable:
     workflow.set_entry_point("supervisor")
 
     #add nodes to the graph
-    workflow.add_node("supervisor",supervisor_chain)
+    workflow.add_node("supervisor", supervisor_node)
     workflow.add_node("customer_support", customer_node)
     workflow.add_node("sales_manager", sales_node)
     workflow.add_node("tachnical_support", tech_node)
