@@ -67,7 +67,7 @@ def supervisor_node(state):
     # Get the raw LLM output
     raw_chain = prompt | llm.bind(functions=[function_def], function_call={"name": "route"})
     raw_output = raw_chain.invoke(state)
-    print("Raw LLM output:", raw_output)
+    #print("Raw LLM output:", raw_output)
     function_call = raw_output.additional_kwargs.get("function_call")
     next_value = None
     answer = None

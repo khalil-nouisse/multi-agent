@@ -10,7 +10,7 @@ def main():
 
     graph = build_graph()
     input_data = {
-        "messages": [HumanMessage(content="i need help from the technical support agent ! i need to know the state of my ticket with title : ticket123")],
+        "messages": [HumanMessage(content="i need help from the technical support agent ! i need to know the state of my ticket with title : salam123")],
         "next": "supervisor"
     }
 
@@ -18,11 +18,33 @@ def main():
 
     result = graph.invoke(input_data, config={"callbacks": callback_manager})
 
-    #print("\n✅ Final Result:\n", result)
-    final_message = result["messages"][-1]
-    print("Agent:", final_message.content)
+    def display_conversation(messages):
+        shown = set()
+        for msg in messages:
+            sender = getattr(msg, "name", "user")
+            # Optionally skip duplicate messages
+            key = (sender, msg.content)
+            if key in shown:
+                continue
+            shown.add(key)
+            print(f"{sender}: {msg.content}")
 
+    
+    display_conversation(result["messages"])
 
+    # def show_last_exchange(messages):
+    #     # Find the last agent message
+    #     last_agent_msg = next((m for m in reversed(messages) if getattr(m, "name", None) and m.name != "user"), None)
+    #     # Find the last user message before that
+    #     last_user_msg = None
+    #     if last_agent_msg:
+    #         idx = messages.index(last_agent_msg)
+    #         last_user_msg = next((m for m in reversed(messages[:idx]) if not getattr(m, "name", None)), None)
+    #     if last_user_msg:
+    #         print(f"User: {last_user_msg.content}")
+    #     if last_agent_msg:
+    #         print(f"{last_agent_msg.name}: {last_agent_msg.content}")
+            
 if __name__ == "__main__" :  
     main()
 
