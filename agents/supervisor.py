@@ -5,7 +5,7 @@ from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from config import llm 
 
-
+#name of the nodes of the graph (that represents the agents)
 members = ["customer_support", "sales_manager" , "tachnical_support"]
 system_prompt = (
     "You are a supervisor tasked with managing a conversation between the"
@@ -27,9 +27,8 @@ function_def = {
         "properties": {
             "next": {
                 "title": "Next",
-                "anyOf": [ #choose from the options ["FINISH" , "customer", "sales" , "tech_support"]
-                    {"enum": options},
-                ],
+                "type": "string",
+                "enum": options
             }
         },
         "required": ["next"],
@@ -47,9 +46,14 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(options=str(options), members=", ".join(members))
 
-
+# The actual chain that will be used by the graph
 supervisor_chain = (
     prompt
-    | llm.bind_functions(functions=[function_def], function_call="route")
+    | llm.bind_tools(tools=[function_def], function_call="auto")
     | JsonOutputFunctionsParser()
 )
+# This supervisor chain is the one that will be used to generate the next node . the LLM will output something like:
+# {
+#     "next": "sales_manager",
+# }
+# and the JsonOutputFunctionsParser will turn it into a python dict : {"next": "sales_manager"}

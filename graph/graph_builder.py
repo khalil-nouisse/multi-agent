@@ -3,17 +3,10 @@
 import operator
 from typing import Annotated, Any, Dict, List, Optional, Sequence, TypedDict
 import functools
-from agents_factory import create_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langgraph.graph import StateGraph, END
 from langchain_core.runnables import Runnable
-from config import llm
 from langchain_core.messages import BaseMessage
-
-#agents tools
-from tools.customer_tools import customer_tool_list
-from tools.sales_tools import sales_tool_list
-from tools.tech_tools import tech_tool_list
 
 #load agents
 from agents.sales import sales_agent
@@ -21,7 +14,7 @@ from agents.customer import customer_agent
 from agents.tech_support import tech_support_agent
 from agents.supervisor import supervisor_chain
 
-from agents_factory import agent_node
+from graph.agents_factory import agent_node
 
 # The agent state is the input to each node in the graph
 class AgentState(TypedDict):
@@ -55,15 +48,21 @@ class AgentState(TypedDict):
 #    max_retries: int
 
 
-#create graph nodes
-customer_node = functools.partial(agent_node, agent=customer_agent, name="customer_support")
-sales_node = functools.partial(agent_node, agent=sales_agent, name="sales_manager")
-tech_node = functools.partial(agent_node, agent=tech_support_agent, name="tachnical_support")
 
 
 def build_graph() -> Runnable:
+
+    #create graph nodes
+    customer_node = functools.partial(agent_node, agent=customer_agent, name="customer_support")
+    sales_node = functools.partial(agent_node, agent=sales_agent, name="sales_manager")
+    tech_node = functools.partial(agent_node, agent=tech_support_agent, name="tachnical_support")
+
     #build the graoh
     workflow = StateGraph(AgentState)
+    
+    #graph entry
+    workflow.set_entry_point("supervisor")
+
     #add nodes to the graph
     workflow.add_node("supervisor",supervisor_chain)
     workflow.add_node("customer_support", customer_node)
@@ -72,7 +71,6 @@ def build_graph() -> Runnable:
 
     agents = ["customer_support" ,"sales_manager" ,"tachnical_support"]
 
-    workflow.set_entry_point("supervisor")
 
     #add adges to the graph
     for member in agents :

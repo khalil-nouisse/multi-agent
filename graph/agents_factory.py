@@ -3,6 +3,9 @@ from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langsmith import traceable
+from langsmith1.tracing import get_callback_manager,LangChainTracer
+from config import LANGCHAIN_PROJECT
+
 
 @traceable(name="create_agent")
 def create_agent(llm: ChatOpenAI, tools: list, system_prompt: str):
@@ -18,10 +21,20 @@ def create_agent(llm: ChatOpenAI, tools: list, system_prompt: str):
         ]
     )
     agent = create_openai_tools_agent(llm, tools, prompt)
-    executor = AgentExecutor(agent=agent, tools=tools)
+    callback_manager = get_callback_manager()
+    executor = AgentExecutor(agent=agent,
+                             tools=tools,
+                             callback_manager=callback_manager
+                             )
     return executor
 
 # agent node
 def agent_node(state, agent, name):
+    
     result = agent.invoke(state)
-    return {"messages": [HumanMessage(content=result["output"], name=name)]}
+
+    output = result.get("output")
+    if not isinstance(output, str):
+        output = "Sorry, I couldn’t generate a response."
+
+    return {"messages": [HumanMessage(content=output, name=name)]}

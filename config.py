@@ -1,8 +1,9 @@
 # Global config: API keys, env vars, etc.
-import os
 from dotenv import load_dotenv
+load_dotenv()  # Assure-toi que c'est au tout début
+import os
 from langchain_openai import ChatOpenAI
-load_dotenv()
+
 
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

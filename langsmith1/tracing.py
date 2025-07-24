@@ -1,32 +1,25 @@
 # LangSmith integration (run tracing & evaluation)
-from langsmith import traceable
-from graph.graph_builder import build_graph
-
-input_data = f""""customer_input": "I have a question about my delivery",
-    "sales_input": "New prospect interested in CRM",
-    "supervisor_input": "Review escalation case #782,"
-    "tech_input": "Opportunity ticket: Issue with integration"""
-
-
-@traceable(name="main_graph_run")
-def run_graph():
-    graph = build_graph()  # your graph_builder code
-    return graph.invoke(input_data)
-
-
-
+from dotenv import load_dotenv
 import os
+from langsmith import Client
+load_dotenv()
+from langsmith import traceable
 from langchain.callbacks.tracers import LangChainTracer
 from langchain_core.tracers import ConsoleCallbackHandler
 from langchain_core.callbacks import CallbackManager
 from config import LANGCHAIN_PROJECT
-def get_callback_manager():
-    # Ensure environment variables are set
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
-    os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
-    os.environ["LANGCHAIN_API_KEY"] = "your_langsmith_api_key"  # <-- or load from .env
+from langsmith import Client as LangSmithClient
 
-    tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
+def get_callback_manager():
+
+    #tracer = LangChainTracer(project_name=LANGCHAIN_PROJECT)
+    tracer = LangChainTracer(
+        project_name=os.getenv("LANGCHAIN_PROJECT"),
+        client=LangSmithClient(
+            api_url=os.getenv("LANGCHAIN_ENDPOINT"),
+            api_key=os.getenv("LANGCHAIN_API_KEY")
+        )
+    )
     console = ConsoleCallbackHandler()
 
     return CallbackManager([tracer, console])

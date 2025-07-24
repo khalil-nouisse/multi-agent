@@ -1,6 +1,6 @@
 # Agent logic for sales
 from langchain.prompts import PromptTemplate
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from config import llm
 from tools.sales_tools import sales_tool_list 
 from graph.agents_factory import create_agent
