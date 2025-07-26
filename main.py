@@ -7,15 +7,12 @@ from langsmith1.tracing import get_callback_manager
 from langchain_core.messages import HumanMessage
 
 def main():
-
     graph = build_graph()
     input_data = {
-        "messages": [HumanMessage(content="i need help from the technical support agent ! i need to know the state of my ticket with title : salam123")],
+        "messages": [HumanMessage(content="Hello there ! i want to drink coffee")],
         "next": "supervisor"
     }
-
     callback_manager = get_callback_manager()
-
     result = graph.invoke(input_data, config={"callbacks": callback_manager})
 
     def display_conversation(messages):
@@ -47,4 +44,3 @@ def main():
             
 if __name__ == "__main__" :  
     main()
-
