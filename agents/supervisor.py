@@ -1,5 +1,5 @@
 # LLM-based agent that routes the message
-#It will use function calling to choose the next worker node OR finish processing.
+#It will use function calling to choose the next node or by answering OR finish processing.
 
 from langchain_core.output_parsers import JsonOutputKeyToolsParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -51,17 +51,7 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(options=str(options), members=", ".join(members))
 
-# The actual chain that will be used by the graph
-supervisor_chain = (
-    prompt
-    | llm.bind(functions=[function_def], function_call={"name": "route"})
-    | JsonOutputToolsParser()
-)
-# This supervisor chain is the one that will be used to generate the next node . the LLM will output something like:
-# {
-#     "next": "sales_manager",
-# }
-# and the JsonOutputFunctionsParser will turn it into a python dict : {"next": "sales_manager"}
+
 
 def supervisor_node(state):
     # Get the raw LLM output
@@ -86,3 +76,19 @@ def supervisor_node(state):
         print("Invalid next value from supervisor:", next_value)
         next_value = "FINISH"
     return {**state, "next": next_value}
+
+
+# This function is the one that will be used to generate the next node or the answer. the LLM will output something like:
+# {
+#     "next": "sales_manager",
+#     "answer" : ""
+# }
+
+# or
+
+# {
+#     "next": "FINISH",
+#     "answer" : "hello there !..."
+
+# }
+# and the JsonOutputFunctionsParser will turn it into a python dict : {"next": "sales_manager"}
