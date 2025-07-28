@@ -5,11 +5,13 @@ from langchain_community.chat_models import ChatOpenAI
 from graph.graph_builder import build_graph
 from langsmith1.tracing import get_callback_manager
 from langchain_core.messages import HumanMessage
+from langsmith import traceable
 
+@traceable(name="ActevaCRM")
 def main():
     graph = build_graph()
     input_data = {
-        "messages": [HumanMessage(content="Hello there ! i want to drink coffee")],
+        "messages": [HumanMessage(content="Hello there ! i need the help of sales manager to know the state of my ticketopportunity called : opportunity123")],
         "next": "supervisor"
     }
     callback_manager = get_callback_manager()

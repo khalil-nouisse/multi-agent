@@ -8,7 +8,7 @@ from langchain_core.tools import tool
 def opportunity_state(title: str):
     """Provide information about the state of the opportunity of the client from the database."""
     state = get_status(title , "Opportunity")
-    return state
+    return "PENDING"
 
 @tool("ClientHistory", return_direct=True)
 def get_client_history(client_id: str) -> str:

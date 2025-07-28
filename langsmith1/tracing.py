@@ -16,7 +16,7 @@ def get_callback_manager():
     tracer = LangChainTracer(
         project_name=os.getenv("LANGCHAIN_PROJECT"),
         client=LangSmithClient(
-            api_url=os.getenv("LANGCHAIN_ENDPOINT"),
+            #api_url=os.getenv("LANGCHAIN_ENDPOINT"),
             api_key=os.getenv("LANGCHAIN_API_KEY")
         )
     )
