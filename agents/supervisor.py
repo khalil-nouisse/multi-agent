@@ -51,7 +51,18 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(options=str(options), members=", ".join(members))
 
-
+# The actual chain that will be used by the graph
+supervisor_chain = (
+    prompt
+    | llm.bind(functions=[function_def], function_call={"name": "route"})
+    | JsonOutputToolsParser()
+)
+# The actual chain that will be used by the graph
+supervisor_chain = (
+    prompt
+    | llm.bind(functions=[function_def], function_call={"name": "route"})
+    | JsonOutputToolsParser()
+)
 
 def supervisor_node(state):
     # Get the raw LLM output
@@ -89,6 +100,4 @@ def supervisor_node(state):
 # {
 #     "next": "FINISH",
 #     "answer" : "hello there !..."
-
 # }
-# and the JsonOutputFunctionsParser will turn it into a python dict : {"next": "sales_manager"}
