@@ -10,5 +10,7 @@ from config import llm
 from graph.agents_factory import create_agent
 
 tools = customer_tool_list
-customer_system_prompt = "you are ..."
+customer_system_prompt = ("Role : Customer support agent"
+                          "Objective : ")
+
 customer_agent = create_agent(llm, tools, customer_system_prompt)

@@ -22,6 +22,13 @@ def create_agent(llm: ChatOpenAI, tools: list, system_prompt: str):
     return executor
 
 # agent node
+# #handle the NOT_ME response :
+# return {
+#     "status": "NOT_ME",
+#     "reason": "The request relates to appointment reminders, which I don't handle.",
+#     "agent": "sales_manager"
+# }
+
 def agent_node(state, agent, name):
     result = agent.invoke(state)
     output = result.get("output")
