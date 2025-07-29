@@ -13,14 +13,14 @@ import json
 #name of the nodes of the graph (that represents the agents)
 members = ["customer_support", "sales_manager" , "tachnical_support"]
 
-system_prompt = (
-    f"You are a supervisor tasked with managing a conversation between the following workers: {','.join(members)}. "
-    "Given the following user request, you must always respond by calling the 'route' function. "
-    "If the user's request is a general question, greeting, or something you can answer directly, provide the answer in the 'answer' field and set 'next' to 'FINISH'. "
-    "If the request is about sales, customer support, or technical support, set 'answer' to an empty string and select the next agent in the 'next' field. "
-    "If the user goes off-topic, gently guide them back to the main objective.\n"
-    "Never answer directly in text; always use the function call."
-)
+# system_prompt = (
+#     f"You are a supervisor tasked with managing a conversation between the following workers: {','.join(members)}. "
+#     "Given the following user request, you must always respond by calling the 'route' function. "
+#     "If the user's request is a general question, greeting, or something you can answer directly, provide the answer in the 'answer' field and set 'next' to 'FINISH'. "
+#     "If the request is about sales, customer support, or technical support, set 'answer' to an empty string and select the next agent in the 'next' field. "
+#     "If the user goes off-topic, gently guide them back to the main objective.\n"
+#     "Never answer directly in text; always use the function call."
+# )
 supervisor_system_prompt = (
     "Role: Conversation Supervisor\n"
     "Objective: Manage routing of user requests to the appropriate agent.\n"
@@ -72,7 +72,7 @@ function_def = {
 }
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", system_prompt),
+        ("system", supervisor_system_prompt),
         MessagesPlaceholder(variable_name="messages"),
         (
             "system",
@@ -93,27 +93,67 @@ supervisor_chain = (
 def supervisor_node(state):
     # Get the raw LLM output
     raw_chain = prompt | llm.bind(functions=[function_def], function_call={"name": "route"})
-    raw_output = raw_chain.invoke(state)
-    #print("Raw LLM output:", raw_output)
-    function_call = raw_output.additional_kwargs.get("function_call")
-    next_value = None
-    answer = None
-    if function_call and "arguments" in function_call:
+
+    # Initial options
+    tried_agents = set()
+    all_agents = {"customer_support", "sales_manager", "tachnical_support"}
+    remaining_agents = all_agents.copy()
+
+    while True : 
+        raw_output = raw_chain.invoke(state)
+        #print("Raw LLM output:", raw_output)
+        function_call = raw_output.additional_kwargs.get("function_call")
+    
+        if not function_call or "arguments" not in function_call:
+            # Invalid output
+            return {**state, "next": "FINISH", "messages": state["messages"] + [
+                type(state["messages"][0])(content="Sorry, I couldn’t understand the request.", name="supervisor")
+            ]}
+        
         args = json.loads(function_call["arguments"])
         next_value = args.get("next")
-        answer = args.get("answer")
-    print("Supervisor chose next:", next_value, "answer:", answer)
-    valid_options = ["customer_support", "sales_manager", "tachnical_support", "FINISH"]
-    if answer and answer.strip():
-        messages = list(state["messages"]) + [
-            type(state["messages"][0])(content=answer, name="supervisor")
-        ]
-        return {**state, "messages": messages, "next": "FINISH"}
-    if next_value not in valid_options:
-        print("Invalid next value from supervisor:", next_value)
-        next_value = "FINISH"
-    return {**state, "next": next_value}
+        answer = args.get("answer", "").strip()
 
+        print("Supervisor chose next : ", next_value ," Answer : ", answer)
+
+        if answer == "NOT_ME" :
+            tried_agents.add(next_value)
+            remaining_agents = remaining_agents - next_value
+
+            if not remaining_agents :
+                return {**state, "next": "FINISH", "messages": state["messages"] + [
+                    type(state["messages"][0])(content="I'm sorry, but I couldn't find the right person to handle your request.", name="supervisor")
+                ]}
+        
+            retry_prompt = ChatPromptTemplate.from_messages(
+                [
+                    ("system", supervisor_system_prompt),
+                    MessagesPlaceholder(variable_name="messages"),
+                    (
+                        "system",
+                        "Given the conversation above, who should act next?"
+                        f" Or should we FINISH? Select one of: {remaining_agents}",
+                    ),
+                ]
+            ).partial(options=str(options), members=", ".join(members))
+
+            raw_chain = retry_prompt | llm.bind(functions=[function_def], function_call={"name": "route"})
+
+            continue
+        #if the agent gave a real answer
+        if answer and answer.strip():
+            messages = list(state["messages"]) + [
+                type(state["messages"][0])(content=answer, name="supervisor")
+            ]
+            return {**state, "messages": messages, "next": "FINISH"}
+        
+
+        if next_value not in all_agents and next_value != "FINISH":
+            print("Invalid next value from supervisor:", next_value)
+            next_value = "FINISH"
+
+        return {**state, "next": next_value}
+   
 
 # This function is the one that will be used to generate the next node or the answer. the LLM will output something like:
 # {

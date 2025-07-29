@@ -11,7 +11,7 @@ from langsmith import traceable
 def main():
     graph = build_graph()
     input_data = {
-        "messages": [HumanMessage(content="Hello there ! i need the help of sales manager to know the state of my ticketopportunity called : opportunity123")],
+        "messages": [HumanMessage(content="Hello there ! i need the help from the to know the state of my opportunity called : opportunity123")],
         "next": "supervisor"
     }
     callback_manager = get_callback_manager()

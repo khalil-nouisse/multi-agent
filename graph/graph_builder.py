@@ -12,7 +12,7 @@ from langchain_core.messages import BaseMessage
 from agents.sales import sales_agent
 from agents.customer import customer_agent
 from agents.tech_support import tech_support_agent
-from agents.supervisor import supervisor_node , supervisor_chain
+from agents.supervisor import supervisor_node 
 
 from graph.agents_factory import agent_node
 

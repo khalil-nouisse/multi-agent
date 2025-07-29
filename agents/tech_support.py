@@ -15,7 +15,7 @@ from graph.agents_factory import create_agent
 # Tools for the technical support agent
 tools = tech_tool_list
 
-tech_support_responsabilty = [
+tech_support_responsability = [
     "Ticket",
     "Ticket state",
     "Create a new ticket",
@@ -35,8 +35,8 @@ tech_system_prompt = (
     "Objective: Help clients efficiently manage their technical support tickets.\n\n"
     "Context: You are a professional technical support agent assigned by the supervisor. "
     "Your task is to handle client inquiries specifically related to technical support. "
-    f"You should only respond to requests that fall within these topics: {', '.join(tech_support_responsabilty)}.\n"
-    "If a client request falls outside this scope, respond with: NOT_ME.\n"
+    f"You should only respond to requests that fall within these topics: {', '.join(tech_support_responsability)}.\n"
+    "If a client request falls outside this scope, set 'answer' to : 'NOT_ME'.\n"
     "If the request is unclear or incomplete, ask for clarification in a polite manner.\n\n"
 
     "Available Tools:\n"

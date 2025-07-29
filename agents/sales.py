@@ -29,7 +29,7 @@ sales_system_prompt = (
     "Your job is to help clients with various sales-related tasks. "
     "The client will provide a request related to one of the following topics: "
     f"{', '.join(sales_manager_responsability)}.\n"
-    "If the request is not related to one of these topics, respond with: NOT_ME.\n"
+    "If the request is not related to one of these topics, set 'answer' to : 'NOT_ME'.\n"
     "If the request is unclear, incomplete, or ambiguous, politely ask the client for clarification.\n"
     "If the user goes off-topic, gently guide them back to the sales-related objective.\n\n"
 
