@@ -36,4 +36,8 @@ def agent_node(state, agent, name):
         output = "Sorry, I couldn’t generate a response."
     # Append the new message to the existing messages
     messages = list(state["messages"]) + [HumanMessage(content=output, name=name)]
-    return {**state, "messages": messages}
+
+    if output == "NOT_ME" :
+        return {**state, "messages": messages, "next": "supervisor"}
+
+    return {**state, "messages": messages, "next": "FINISH"}

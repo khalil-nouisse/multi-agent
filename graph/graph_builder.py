@@ -55,7 +55,7 @@ def build_graph() -> Runnable:
     #create graph nodes
     customer_node = functools.partial(agent_node, agent=customer_agent, name="customer_support")
     sales_node = functools.partial(agent_node, agent=sales_agent, name="sales_manager")
-    tech_node = functools.partial(agent_node, agent=tech_support_agent, name="tachnical_support")
+    tech_node = functools.partial(agent_node, agent=tech_support_agent, name="technical_support")
 
     #build the graoh
     workflow = StateGraph(AgentState)
@@ -67,20 +67,19 @@ def build_graph() -> Runnable:
     workflow.add_node("supervisor", supervisor_node)
     workflow.add_node("customer_support", customer_node)
     workflow.add_node("sales_manager", sales_node)
-    workflow.add_node("tachnical_support", tech_node)
+    workflow.add_node("technical_support", tech_node)
 
-    agents = ["customer_support" ,"sales_manager" ,"tachnical_support"]
-
-
-    #add adges to the graph
-    for member in agents :
-        workflow.add_edge(member, "supervisor")
+    agents = ["customer_support" ,"sales_manager" ,"technical_support"]
 
     # The supervisor populates the "next" field in the graph state
     # which routes to a node or finishes
     conditional_map = {k: k for k in agents}
     conditional_map["FINISH"] = END
     workflow.add_conditional_edges("supervisor", lambda x: x["next"], conditional_map)
+    
+    # Add edges from agents back to supervisor
+    for member in agents:
+        workflow.add_edge(member, "supervisor")
 
     graph = workflow.compile()
 

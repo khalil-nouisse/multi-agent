@@ -11,7 +11,7 @@ from config import llm
 import json
 
 #name of the nodes of the graph (that represents the agents)
-members = ["customer_support", "sales_manager" , "tachnical_support"]
+members = ["customer_support", "sales_manager" , "technical_support"]
 
 # system_prompt = (
 #     f"You are a supervisor tasked with managing a conversation between the following workers: {','.join(members)}. "
@@ -41,7 +41,7 @@ supervisor_system_prompt = (
     "Examples:"
     "I want to create a new opportunity → sales"
     #"I can't access my account → customer_support "
-    "i need to know the state of my ticket : id=1 → tech_support"
+    "i need to know the state of my ticket : id=1 → technical_support"
     "Communication Guidelines:\n"
     "- Never respond directly in plain text — always use the `route` function.\n"
     "- Your goal is to streamline the conversation and ensure user queries are handled by the correct agent.\n"
@@ -91,68 +91,54 @@ supervisor_chain = (
 
 
 def supervisor_node(state):
+    # Count how many agents have responded with "NOT_ME"
+    not_me_count = 0
+    for msg in state["messages"]:
+        if hasattr(msg, 'name') and msg.name in {"customer_support", "sales_manager", "technical_support"} and msg.content == "NOT_ME":
+            not_me_count += 1
+    
+    # If all agents have responded with "NOT_ME", provide final response
+    if not_me_count >= 3:
+        return {**state, "next": "FINISH", "messages": state["messages"] + [
+            type(state["messages"][0])(content="I'm sorry, but your request is outside the scope of our available services. We can help with sales processes, customer support, and technical support for our products, but we cannot assist with general coding or programming tasks. Please contact a software development specialist for coding assistance.", name="supervisor")
+        ]}
+    
     # Get the raw LLM output
     raw_chain = prompt | llm.bind(functions=[function_def], function_call={"name": "route"})
-
-    # Initial options
-    tried_agents = set()
-    all_agents = {"customer_support", "sales_manager", "tachnical_support"}
-    remaining_agents = all_agents.copy()
-
-    while True : 
-        raw_output = raw_chain.invoke(state)
-        #print("Raw LLM output:", raw_output)
-        function_call = raw_output.additional_kwargs.get("function_call")
     
-        if not function_call or "arguments" not in function_call:
-            # Invalid output
-            return {**state, "next": "FINISH", "messages": state["messages"] + [
-                type(state["messages"][0])(content="Sorry, I couldn’t understand the request.", name="supervisor")
-            ]}
-        
-        args = json.loads(function_call["arguments"])
-        next_value = args.get("next")
-        answer = args.get("answer", "").strip()
+    # Truncate conversation history if it gets too long (keep last 5 messages)
+    if len(state["messages"]) > 5:
+        state["messages"] = state["messages"][-5:]
+    
+    raw_output = raw_chain.invoke(state)
+    function_call = raw_output.additional_kwargs.get("function_call")
 
-        print("Supervisor chose next : ", next_value ," Answer : ", answer)
+    if not function_call or "arguments" not in function_call:
+        # Invalid output
+        return {**state, "next": "FINISH", "messages": state["messages"] + [
+            type(state["messages"][0])(content="Sorry, I couldn't understand the request.", name="supervisor")
+        ]}
+    
+    args = json.loads(function_call["arguments"])
+    next_value = args.get("next")
+    answer = args.get("answer", "").strip()
+    
+    print(f"[Supervisor] Next: {next_value}, Answer: {answer or 'N/A'}, NOT_ME count: {not_me_count}")
 
-        if answer == "NOT_ME" :
-            tried_agents.add(next_value)
-            remaining_agents = remaining_agents - next_value
+    # If the supervisor wants to answer directly
+    if answer and answer.strip():
+        messages = list(state["messages"]) + [
+            type(state["messages"][0])(content=answer, name="supervisor")
+        ]
+        return {**state, "messages": messages, "next": "FINISH"}
 
-            if not remaining_agents :
-                return {**state, "next": "FINISH", "messages": state["messages"] + [
-                    type(state["messages"][0])(content="I'm sorry, but I couldn't find the right person to handle your request.", name="supervisor")
-                ]}
-        
-            retry_prompt = ChatPromptTemplate.from_messages(
-                [
-                    ("system", supervisor_system_prompt),
-                    MessagesPlaceholder(variable_name="messages"),
-                    (
-                        "system",
-                        "Given the conversation above, who should act next?"
-                        f" Or should we FINISH? Select one of: {remaining_agents}",
-                    ),
-                ]
-            ).partial(options=str(options), members=", ".join(members))
+    # Route to the next agent
+    if next_value not in {"customer_support", "sales_manager", "technical_support"} and next_value != "FINISH":
+        print("Invalid next value from supervisor:", next_value)
+        next_value = "FINISH"
 
-            raw_chain = retry_prompt | llm.bind(functions=[function_def], function_call={"name": "route"})
-
-            continue
-        #if the agent gave a real answer
-        if answer and answer.strip():
-            messages = list(state["messages"]) + [
-                type(state["messages"][0])(content=answer, name="supervisor")
-            ]
-            return {**state, "messages": messages, "next": "FINISH"}
-        
-
-        if next_value not in all_agents and next_value != "FINISH":
-            print("Invalid next value from supervisor:", next_value)
-            next_value = "FINISH"
-
-        return {**state, "next": next_value}
+    messages = list(state["messages"])
+    return {**state, "next": next_value, "messages": messages}
    
 
 # This function is the one that will be used to generate the next node or the answer. the LLM will output something like:
