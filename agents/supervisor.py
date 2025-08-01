@@ -134,13 +134,14 @@ def supervisor_node(state):
         ]
         return {**state, "messages": messages, "next": "FINISH"}
 
-    # Route to the next agent
+    # FINISH if no valid agent response from supervisor 
     if next_value not in {"customer_support", "sales_manager", "technical_support"} and next_value != "FINISH":
         print("Invalid next value from supervisor:", next_value)
         next_value = "FINISH"
-
+    
+    # Route to the next agent
     messages = list(state["messages"])
-    return {**state, "next": next_value, "messages": messages}
+    return {**state, "next": next_value, "messages": messages , "communication_type" : 'direct_api'}
    
 
 # This function is the one that will be used to generate the next node or the answer. the LLM will output something like:

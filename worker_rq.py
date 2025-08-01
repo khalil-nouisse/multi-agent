@@ -8,11 +8,10 @@ from dispatcher.event_dispatcher import EventDispatcher
 redis_conn = Redis()
 
 @job('default', connection=redis_conn, timeout=600)
-
 #Receives event_type and payload_json
 def process_event(event_type, payload_json):
     try:
-        #Converts the payload string into a Python dictionary.
+        #Converts the payload Json string into a Python dictionary:  '{'name' : 'jack'}' => {'name' : 'jack'} 
         payload = json.loads(payload_json)
     except json.JSONDecodeError:
         print("Invalid JSON payload")
