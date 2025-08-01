@@ -92,13 +92,15 @@ supervisor_chain = (
 
 def supervisor_node(state):
     # Count how many agents have responded with "NOT_ME"
+    members = ["customer_support", "sales_manager" , "technical_support"]
+    max_not_me = len(members)
     not_me_count = 0
     for msg in state["messages"]:
         if hasattr(msg, 'name') and msg.name in {"customer_support", "sales_manager", "technical_support"} and msg.content == "NOT_ME":
             not_me_count += 1
     
     # If all agents have responded with "NOT_ME", provide final response
-    if not_me_count >= 3:
+    if not_me_count >= max_not_me:
         return {**state, "next": "FINISH", "messages": state["messages"] + [
             type(state["messages"][0])(content="I'm sorry, but your request is outside the scope of our available services. We can help with sales processes, customer support, and technical support for our products, but we cannot assist with general coding or programming tasks. Please contact a software development specialist for coding assistance.", name="supervisor")
         ]}
