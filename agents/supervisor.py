@@ -7,20 +7,13 @@ from langchain_core.tools import tool
 from langchain_core.output_parsers import JsonOutputToolsParser
 from agents.sales import sales_manager_responsability
 from agents.tech_support import tech_support_responsability
+from event_types import CommunicationType
 from config import llm 
 import json
 
 #name of the nodes of the graph (that represents the agents)
 members = ["customer_support", "sales_manager" , "technical_support"]
 
-# system_prompt = (
-#     f"You are a supervisor tasked with managing a conversation between the following workers: {','.join(members)}. "
-#     "Given the following user request, you must always respond by calling the 'route' function. "
-#     "If the user's request is a general question, greeting, or something you can answer directly, provide the answer in the 'answer' field and set 'next' to 'FINISH'. "
-#     "If the request is about sales, customer support, or technical support, set 'answer' to an empty string and select the next agent in the 'next' field. "
-#     "If the user goes off-topic, gently guide them back to the main objective.\n"
-#     "Never answer directly in text; always use the function call."
-# )
 supervisor_system_prompt = (
     "Role: Conversation Supervisor\n"
     "Objective: Manage routing of user requests to the appropriate agent.\n"
@@ -141,7 +134,7 @@ def supervisor_node(state):
     
     # Route to the next agent
     messages = list(state["messages"])
-    return {**state, "next": next_value, "messages": messages , "communication_type" : 'direct_api'}
+    return {**state, "next": next_value, "messages": messages , "communication_type" : CommunicationType.DIRECT_API}
    
 
 # This function is the one that will be used to generate the next node or the answer. the LLM will output something like:

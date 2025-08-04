@@ -1,0 +1,26 @@
+{
+  "ticket_created": {
+    "name": "Ticket Created",
+    "description": "Sent when a new ticket is created",
+    "required_vars": ["ticket", "customer", "subject", "message"],
+    "category": "ticket_notifications"
+  },
+  "ticket_updated": {
+    "name": "Ticket Updated", 
+    "description": "Sent when a ticket is updated",
+    "required_vars": ["ticket", "customer", "subject", "message"],
+    "category": "ticket_notifications"
+  },
+  "ticket_resolved": {
+    "name": "Ticket Resolved",
+    "description": "Sent when a ticket is resolved",
+    "required_vars": ["ticket", "customer", "subject", "message"],
+    "category": "ticket_notifications"
+  },
+  "ticket_closed": {
+    "name": "Ticket Closed",
+    "description": "Sent when a ticket is closed",
+    "required_vars": ["ticket", "customer", "subject", "message"],
+    "category": "ticket_notifications"
+  }
+}

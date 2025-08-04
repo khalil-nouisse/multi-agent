@@ -19,3 +19,12 @@ class EventType(Enum):
 
     #customer support events
     CUSTOMER_UPDATE = "customer_update"
+
+    QUEUE_TECH_SUPPORT_EVENTS = [TICKET_CREATE ,TICKET_STATE_UPDATE ,TICKET_UPDATE ,TICKET_DELETE ,TICKET_CLOSE]
+
+# Communication Type Constants
+class CommunicationType(Enum):
+    ASYNC_QUEUE = "async_queue"    # Redis queue with structured data
+    DIRECT_API = "direct_api"      # Direct API calls with natural language
+
+

@@ -5,7 +5,7 @@ from langchain_community.chat_models import ChatOpenAI
 from config import llm
 from tools.tech_tools import tech_tool_list 
 from graph.agents_factory import create_agent
-
+from event_types import EventType
 # Tools for the technical support agent
 tools = tech_tool_list
 
@@ -22,14 +22,19 @@ tech_support_responsibilities = [
     "Multi-channel notification for tickets",
 ]
 
+
 # Define the system prompt for the tech support agent
 tech_system_prompt = (
     "Role: Technical Support Manager\n"
     "Objective: Help clients efficiently manage their technical support tickets through multiple communication channels.\n\n"
-    
+
     "IMPORTANT: You handle TWO types of communication:\n\n"
     
     "1. ASYNC QUEUE (from CRM via Redis):\n"
+    f"   -You receive one of the following event types : {', '.join(EventType.QUEUE_TECH_SUPPORT_EVENTS)} \n"
+    "    -You need to respond by correct tool based on the event type :\n"
+    "       # 'ticket create' -> send email "
+
     "   - You receive complete structured ticket data\n"
     "   - Use 'process_new_ticket' tool for tickets created in CRM\n"
     "   - All ticket information is already provided\n"

@@ -1,5 +1,5 @@
 from langchain_core.messages import HumanMessage
-from event_types import EventType
+from event_types import EventType , CommunicationType
 class EventDispatcher:
     def __init__(self, graph):
         self.graph = graph
@@ -21,7 +21,7 @@ class EventDispatcher:
             #costumer support events
             EventType.CUSTOMER_UPDATE : self.handle_customer_update,    
         }
-        self.communication_type = 'async_queue'
+        self.communication_type = CommunicationType
 
     def dispatch(self, event_type, payload):
         #this searchs for the right function to call based on the event type
@@ -94,7 +94,6 @@ class EventDispatcher:
         })                  
 
 
-
     #sales_Agent Rooting
     def handle_opportunity_create(self , payload):
 
@@ -158,7 +157,6 @@ class EventDispatcher:
     
 
     # Customer support Rooting
-
     def handle_customer_update(self, payload):
         print("[Dispatch] Customer updated:", payload)
         message = f"Customer update: {payload.get('info', str(payload))}"
@@ -168,6 +166,8 @@ class EventDispatcher:
             "communication_type" : self.communication_type
         })
     
+
+    #default handler
     def handle_default(self, payload):
         print("[Dispatch] Unknown event type")
         return {"error": "Unknown event type"}
