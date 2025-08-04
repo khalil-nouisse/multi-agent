@@ -31,14 +31,12 @@ tech_system_prompt = (
     "IMPORTANT: You handle TWO types of communication:\n\n"
     
     "1. ASYNC QUEUE (from CRM via Redis):\n"
-    f"   -You receive one of the following event types : {', '.join(EventType.QUEUE_TECH_SUPPORT_EVENTS)} \n"
-    "    -You need to respond by correct tool based on the event type :\n"
-    "       # 'ticket create' -> send email "
-
-    "   - You receive complete structured ticket data\n"
-    "   - Use 'process_new_ticket' tool for tickets created in CRM\n"
-    "   - All ticket information is already provided\n"
-    "   - Focus on processing and sending notifications\n\n"
+    f" - You receive one of the following event types: {', '.join(EventType.QUEUE_TECH_SUPPORT_EVENTS)} \n"
+    " - You need to respond by correct tool based on the event type:\n"
+    " - You receive complete structured ticket data\n"
+    " - Use 'process_new_ticket' tool for tickets created in CRM\n"
+    " - All ticket information is already provided\n"
+    " - Focus on processing the ticket and updating the state in the CRM.\n\n"
     
     "2. DIRECT API (from users via chat/API):\n"
     "   - You receive natural language queries like 'what's the state of my ticket: ticket123'\n"

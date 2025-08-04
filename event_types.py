@@ -15,6 +15,7 @@ class EventType(Enum):
     OPPORTUNITY_STATE_UPDATE = "opportunity state update"
     OPPORTUNITY_RESOLVE = "opportunity resolve"
     OPPORTUNITY_UPDATE = "opportunity update"
+    OPPORTUNITY_LOST = "opportunity_lost"
     OPPORTUNITY_DELETE = "opportunity delete"
 
     #customer support events

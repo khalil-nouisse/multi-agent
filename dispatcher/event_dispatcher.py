@@ -1,173 +1,160 @@
+# communication/event_dispatcher.py
+
 from langchain_core.messages import HumanMessage
-from event_types import EventType , CommunicationType
+from event_types import EventType, CommunicationType
+from communication.email.email_agent import email_agent # Import the new email agent
+
 class EventDispatcher:
     def __init__(self, graph):
         self.graph = graph
+        self.email_agent = email_agent # Use the instantiated email agent
         self.routes = {
-            #techical support events
-            EventType.TICKET_CREATE : self.handle_ticket_create,
-            EventType.TICKET_STATE_UPDATE : self.handle_ticket_state_update,
-            EventType.TICKET_UPDATE : self.handle_ticket_update,
-            EventType.TICKET_DELETE : self.handle_ticket_delete,
-            EventType.TICKET_CLOSE : self.handle_ticket_close,
-            
-            #sales manager events
-            EventType.OPPORTUNITY_CREATE : self.handle_opportunity_create,
-            EventType.OPPORTUNITY_STATE_UPDATE : self.handle_opportunity_state_update,
-            EventType.OPPORTUNITY_UPDATE : self.handle_opportunity_update,
-            EventType.OPPORTUNITY_RESOLVE : self.handle_opportunity_resolve,
-            EventType.OPPORTUNITY_DELETE : self.handle_opportunity_delete,
+            # Each event now maps to a list of handlers : agents rooting and email rooting
+            EventType.TICKET_CREATE: [self.handle_ticket_create_agent, self.handle_email_notification],
+            EventType.TICKET_STATE_UPDATE: [self.handle_ticket_state_update_agent, self.handle_email_notification],
+            EventType.TICKET_UPDATE: [self.handle_ticket_update_agentm, self.handle_email_notification ],
+            EventType.TICKET_CLOSE: [self.handle_ticket_close_agent, self.handle_email_notification],
+            EventType.TICKET_DELETE: [self.handle_ticket_delete_agentm, self.handle_email_notification],
 
-            #costumer support events
-            EventType.CUSTOMER_UPDATE : self.handle_customer_update,    
+            EventType.OPPORTUNITY_CREATE: [self.handle_opportunity_create_agent, self.handle_email_notification],
+            EventType.OPPORTUNITY_STATE_UPDATE: [self.handle_opportunity_state_update_agent, self.handle_email_notification],
+            EventType.OPPORTUNITY_UPDATE: [self.handle_opportunity_update_agent, self.handle_email_notification],
+            EventType.OPPORTUNITY_RESOLVE: [self.handle_opportunity_resolve_agent, self.handle_email_notification],
+            EventType.OPPORTUNITY_LOST :  [self.handle_opportunity_lost_agent, self.handle_email_notification],
+            EventType.OPPORTUNITY_DELETE: [self.handle_opportunity_delete_agentm, self.handle_email_notification],
+
+            #EventType.CUSTOMER_UPDATE: [self.handle_customer_update_agent],
         }
         self.communication_type = CommunicationType
 
     def dispatch(self, event_type, payload):
-        #this searchs for the right function to call based on the event type
-        handler = self.routes.get(event_type, self.handle_default)
-        return handler(payload)   #call the function chosen whith the content
-    
-    #technical support Rooting
-    def handle_ticket_create(self, payload):
+        handlers = self.routes.get(event_type, [self.handle_default])
+        for handler in handlers:
+            handler(event_type, payload) # Pass event_type to handlers
 
+    #email handler
+    def handle_email_notification(self, event_type, payload):
+        self.email_agent.send_notification(event_type, payload)
+
+
+    # --- Agent-specific handlers  ---
+    #technical support rooting
+    def handle_ticket_create_agent(self, event_type, payload):
+        # ... your existing logic for invoking the technical_support graph
         print("[Dispatch] Ticket created:", payload)
-
-        #Extract message from payload, with fallback
         message = payload.get("message", "New ticket created.")
-
-        #Invoke a graph/workflow system , Safely extracts the "message" field from the payload dictionary ,If "message" doesn't exist, uses "New ticket created." as default
         return self.graph.invoke({
             "messages": [HumanMessage(content=message)],
             "next": "technical_support",
-            "communication_type" : self.communication_type
-        })
-
-    def handle_ticket_state_update(self, payload):
-
-        print("[Dispatch] Ticket state update:", payload)
-
-        message = payload.get("message", "ticket state updated.")
-
-        return self.graph.invoke({
-            "messages": [HumanMessage(content=message)],
-            "next": "technical_support",
-            "communication_type" : self.communication_type
-        }) 
-
-    def handle_ticket_update(self, payload):
-
-        print("[Dispatch] Ticket update:", payload)
-
-        message = payload.get("message", "ticket updated.")
-
-        return self.graph.invoke({
-            "messages": [HumanMessage(content=message)],
-            "next": "technical_support",
-            "communication_type" : self.communication_type
-        }) 
-
-    def handle_ticket_close(self, payload):
-
-        print("[Dispatch] Ticket closed:", payload)
-
-        message = payload.get("message", "ticket closed.")
-
-        return self.graph.invoke({
-            "messages": [HumanMessage(content=message)],
-            "next": "technical_support",
-            "communication_type" : self.communication_type
+            "communication_type": self.communication_type,
+            "event_type": event_type
         })
     
-    def handle_ticket_delete(self, payload):
-
-        print("[Dispatch] Ticket deleted:", payload)
-
-        #Extract message from payload, with fallback
-        message = payload.get("message", "ticket deleted.")
-
-        #Invoke a graph/workflow system , Safely extracts the "message" field from the payload dictionary ,If "message" doesn't exist, uses "New ticket created." as default
+    def handle_ticket_update_agent(self ,event_type, payload):
+        print("[Dispatch] Ticket updated", payload)
+        message = payload.get("message" , "Ticket updated.")
         return self.graph.invoke({
-            "messages": [HumanMessage(content=message)],
-            "next": "technical_support",
-            "communication_type" : self.communication_type
-        })                  
-
-
-    #sales_Agent Rooting
-    def handle_opportunity_create(self , payload):
-
-        print("[Dispatch] Opportunity Created:", payload)
-
-        message = payload.get("message", "New opportunity created")
-    
-        return self.graph.invoke({
-            "message": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
         })
     
-    def handle_opportunity_state_update(self , payload):
-
-        print("[Dispatch] opportunity state updated:", payload)
-
-        message = payload.get("message", "opportunity state update")
-
+    def handle_ticket_state_update_agent(self ,event_type, payload):
+        print("[Dispatch] Ticket state updated", payload)
+        message = payload.get("message" , "Ticket state updated.")
         return self.graph.invoke({
-            "message": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
-        })
-    
-    def handle_opportunity_update(self , payload):
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })    
 
-        print("[Dispatch] opportunity updated:", payload)
-
-        message = payload.get("message", "opportunity update")
-
+    def handle_ticket_close_agent(self ,event_type, payload):
+        print("[Dispatch] Ticket closed", payload)
+        message = payload.get("message" , "Ticket closed.")
         return self.graph.invoke({
-            "message": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
-        })
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })    
 
-    def handle_opportunity_resolve(self , payload):
-
-        print("[Dispatch] opportunity resolved:", payload)
-
-        message = payload.get("message", "opportunity resolved")
-
+    def handle_ticket_delete_agent(self ,event_type, payload):
+        print("[Dispatch] Ticket deleted", payload)
+        message = payload.get("message" , "Ticket deleted.")
         return self.graph.invoke({
-            "message": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
-        })
-
-    def handle_opportunity_delete(self , payload):
-
-        print("[Dispatch] opportunity delted:", payload)
-
-        message = payload.get("message", "opportunity delete")
-
-        return self.graph.invoke({
-            "message": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
         })    
     
 
-    # Customer support Rooting
-    def handle_customer_update(self, payload):
-        print("[Dispatch] Customer updated:", payload)
-        message = f"Customer update: {payload.get('info', str(payload))}"
+    #sales manager rooting
+    def handle_opportunity_create_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity deleted", payload)
+        message = payload.get("message" , "opportunity deleted.")
         return self.graph.invoke({
-            "messages": [HumanMessage(content=message)],
-            "next": "sales_manager",
-            "communication_type" : self.communication_type
-        })
-    
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })      
 
-    #default handler
-    def handle_default(self, payload):
-        print("[Dispatch] Unknown event type")
+
+    def handle_opportunity_state_update_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity state updated", payload)
+        message = payload.get("message" , "opportunity state updated.")
+        return self.graph.invoke({
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })   
+    
+    def handle_opportunity_update_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity updated", payload)
+        message = payload.get("message" , "opportunity updated.")
+        return self.graph.invoke({
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })         
+
+    def handle_opportunity_resolve_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity resolved", payload)
+        message = payload.get("message" , "opportunity resolved.")
+        return self.graph.invoke({
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })      
+
+    def handle_opportunity_lost_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity lost", payload)
+        message = payload.get("message" , "opportunity lost.")
+        return self.graph.invoke({
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })     
+    
+    def handle_opportunity_delete_agent(self ,event_type, payload):
+        print("[Dispatch] opportunity deleted", payload)
+        message = payload.get("message" , "opportunity deleted.")
+        return self.graph.invoke({
+            "message" : [HumanMessage(content=message)],
+            "next" : "technical_support",
+            "communication" : self.communication_type,
+            "event_type" : event_type
+        })      
+
+
+
+    def handle_default(self, event_type, payload):
+        print(f"[Dispatch] Unknown event type: {event_type}")
         return {"error": "Unknown event type"}
