@@ -21,7 +21,9 @@ class EventType(Enum):
     #customer support events
     CUSTOMER_UPDATE = "customer_update"
 
+    #events
     QUEUE_TECH_SUPPORT_EVENTS = [TICKET_CREATE ,TICKET_STATE_UPDATE ,TICKET_UPDATE ,TICKET_DELETE ,TICKET_CLOSE]
+    QUEUE_SALES_MANAGER_EVENTS = [OPPORTUNITY_CREATE ,OPPORTUNITY_STATE_UPDATE ,OPPORTUNITY_RESOLVE,OPPORTUNITY_UPDATE,OPPORTUNITY_LOST,OPPORTUNITY_DELETE]
 
 # Communication Type Constants
 class CommunicationType(Enum):
@@ -29,3 +31,17 @@ class CommunicationType(Enum):
     DIRECT_API = "direct_api"      # Direct API calls with natural language
 
 
+class Status(Enum) :
+    #ticket status in database
+    TICKET_OPEN = "OPEN"
+    TICKET_PROGRESS = "IN_PROGRESS"
+    TICKET_RESOLVED = "RESOLVED"
+    TICKET_CLOSED = "CLOSED"
+
+    #opportunity status in database
+    OPPORTUNITY_PROSPECTION = "PROSPECTION"
+    OPPORTUNITY_DEMONSTRATION = "DEMONSTRATION"
+    OPPORTUNITY_PROPOSITION = "PROPOSITION"
+    OPPORTUNITY_NEGOCIATION = "NEGOCIATION"
+    OPPORTUNITY_CONTRAT = "CONTRAT"
+    OPPORTUNITY_PERDU = "PERDU"

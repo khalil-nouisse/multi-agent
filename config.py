@@ -18,3 +18,12 @@ SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_PORT = os.getenv("SMTP_PORT")
 SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+
+
+# CRM API configuration
+CRM_API_BASE_URL = os.getenv('CRM_API_URL')
+CRM_API_KEY = os.getenv('CRM_API_KEY')
+
+
+#human support email 
+HUMAN_SUPPORT_EMAIL = os.getenv('HUMAN_SUPPORT_EMAIL')
