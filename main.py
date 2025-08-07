@@ -17,6 +17,8 @@ def run_direct_user_input(user_input: str):
     }
     
     result = graph.invoke(input_data, config={"callbacks": callback_manager})
+    # 3. Handle the final response based on communication type
+    #handle_final_response(final_state)
     display_conversation(result["messages"])
 
 def display_conversation(messages):

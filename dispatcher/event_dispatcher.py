@@ -89,7 +89,6 @@ class EventDispatcher:
             "communication" : self.communication_type,
             "event_type" : event_type
         })    
-    
 
     #sales manager rooting
     def handle_opportunity_create_agent(self ,event_type, payload):
@@ -101,7 +100,6 @@ class EventDispatcher:
             "communication" : self.communication_type,
             "event_type" : event_type
         })      
-
 
     def handle_opportunity_state_update_agent(self ,event_type, payload):
         print("[Dispatch] opportunity state updated", payload)
@@ -152,7 +150,6 @@ class EventDispatcher:
             "communication" : self.communication_type,
             "event_type" : event_type
         })      
-
 
 
     def handle_default(self, event_type, payload):

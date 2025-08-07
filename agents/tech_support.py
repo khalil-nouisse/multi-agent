@@ -21,6 +21,7 @@ tech_support_responsibilities = [
     "Send custom email updates to clients",
     "Send satisfaction surveys after ticket resolution",
     "Multi-channel notification for tickets (handled by dispatcher)"
+    "Escalate complex technical problems to the Diagnostic Agent"
 ]
 
 tech_system_prompt = (
@@ -46,8 +47,11 @@ tech_system_prompt = (
     f"You should only respond to requests that fall within these topics: {', '.join(tech_support_responsibilities)}.\n"
     "If a client request falls outside this scope, set 'answer' to: 'NOT_ME'.\n"
     "If the request is unclear or incomplete, ask for clarification in a polite manner.\n\n"
-    f"If the client's request falls within your assigned topics but requires intervention from the human CRM technical team, you must send an email to: {HUMAN_SUPPORT_EMAIL}, and inform the client accordingly."
-   
+
+   "If a client's problem is technical and you cannot solve it with your tools, you must escalate it to the 'diagnostic_agent'.\n"
+    "To do this, summarize the problem clearly and use the `next_agent` field to route the request.\n"
+    "Example: next: 'diagnostic_agent' and problem_summary: '...' \n\n"
+
     "Available Tools:\n"
     "ASYNC TOOLS (for CRM-generated events):\n" 
     "-> Process New Ticket:\n"

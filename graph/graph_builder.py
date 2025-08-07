@@ -13,7 +13,7 @@ from agents.sales import sales_agent
 from agents.customer import customer_agent
 from agents.tech_support import tech_support_agent
 from agents.supervisor import supervisor_node 
-
+from agents.diagnostic import diagnostic_agent
 from graph.agents_factory import agent_node
 
 # The agent state is the input to each node in the graph
@@ -23,39 +23,13 @@ class AgentState(TypedDict):
     # The 'next' field indicates where to route to next
     next: str
 
-# class AgentState(TypedDict):
-#     # Message history with auto-append
-#     messages: Annotated[List[BaseMessage], operator.add]
-    
-#     # Routing and flow control
-#     next: str
-#     current_agent: str
-    
-#     # Shared context between agents
-#     context: Dict[str, Any]
-    
-#     # Track conversation metadata
-#     conversation_id: str
-#     user_intent: Optional[str]
-    
-#     # Agent-specific data storage
-#     customer_data: Dict[str, Any]
-#     sales_data: Dict[str, Any]
-#     tech_support_data: Dict[str, Any]
-    
-#     # Flow control
-#     retry_count: int
-#    max_retries: int
-
-
-
-
 def build_graph() -> Runnable:
 
     #create graph nodes
     customer_node = functools.partial(agent_node, agent=customer_agent, name="customer_support")
     sales_node = functools.partial(agent_node, agent=sales_agent, name="sales_manager")
     tech_node = functools.partial(agent_node, agent=tech_support_agent, name="technical_support")
+    diagnostic_node = functools.partial(agent_node, agent=diagnostic_agent, name="diagnostic_agent")
 
     #build the graoh
     workflow = StateGraph(AgentState)
@@ -68,8 +42,8 @@ def build_graph() -> Runnable:
     workflow.add_node("customer_support", customer_node)
     workflow.add_node("sales_manager", sales_node)
     workflow.add_node("technical_support", tech_node)
-
-    agents = ["customer_support" ,"sales_manager" ,"technical_support"]
+    workflow.add_node("diagnostic_agent",diagnostic_node)
+    agents = ["customer_support" ,"sales_manager" ,"technical_support" , "diagnostic_agent"]
 
     # The supervisor populates the "next" field in the graph state
     # which routes to a node or finishes

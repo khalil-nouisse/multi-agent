@@ -25,5 +25,11 @@ CRM_API_BASE_URL = os.getenv('CRM_API_URL')
 CRM_API_KEY = os.getenv('CRM_API_KEY')
 
 
+#CHROMA DB and tech LOG files
+CHROMA_DB_URL = os.getenv('CHROMA_DB_URL')
+LOG_AGGREGATION_API_URL = os.getenv('LOG_AGGREGATION_API_URL')
+
+
 #human support email 
 HUMAN_SUPPORT_EMAIL = os.getenv('HUMAN_SUPPORT_EMAIL')
+ENGINEERING_TEAM_EMAIL = os.getenv('ENGINEERING_TEAM_EMAIL')
