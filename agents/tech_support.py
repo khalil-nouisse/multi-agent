@@ -5,7 +5,7 @@ from langchain_community.chat_models import ChatOpenAI
 from config import llm, HUMAN_SUPPORT_EMAIL
 from tools.tech_tools import tech_tool_list 
 from graph.agents_factory import create_agent
-from event_types import EventType , Status , CommunicationType
+from event_types import EventType , Status , CommunicationType , QUEUE_TECH_SUPPORT_EVENTS
 # Tools for the technical support agent
 tools = tech_tool_list
 
@@ -31,7 +31,7 @@ tech_system_prompt = (
     "IMPORTANT: You handle TWO types of communication:\n\n"
     
     "1. ASYNC QUEUE (from CRM via Redis):\n"
-    f" - You receive one of the following event types: {', '.join(EventType.QUEUE_TECH_SUPPORT_EVENTS)} \n"
+    f" - You receive one of the following event types: {', '.join([event.value for event in QUEUE_TECH_SUPPORT_EVENTS])} \n"
     " - You need to respond by correct tool based on the event type:\n"
     " - You receive complete structured ticket data\n"
     " - Use the 'process_new_ticket' tool to analyze and prepare ticket data for further actions.\n"

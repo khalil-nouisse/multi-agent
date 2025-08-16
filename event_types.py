@@ -2,7 +2,7 @@
 from enum import Enum
 
 class EventType(Enum):
-    #technical support events
+    # technical support events
     TICKET_CREATE = "ticket create"
     TICKET_STATE_UPDATE = "ticket state update"
     TICKET_UPDATE = "ticket update"
@@ -10,7 +10,7 @@ class EventType(Enum):
     TICKET_CLOSE = "ticket close"
     TICKET_RESOLUTION_ESTIMATION = "Estimate resolution time"
 
-    #sales manager events
+    # sales manager events
     OPPORTUNITY_CREATE = "opportunity create"
     OPPORTUNITY_STATE_UPDATE = "opportunity state update"
     OPPORTUNITY_RESOLVE = "opportunity resolve"
@@ -18,12 +18,12 @@ class EventType(Enum):
     OPPORTUNITY_LOST = "opportunity_lost"
     OPPORTUNITY_DELETE = "opportunity delete"
 
-    #customer support events
+    # customer support events
     CUSTOMER_UPDATE = "customer_update"
 
-    #events
-    QUEUE_TECH_SUPPORT_EVENTS = [TICKET_CREATE ,TICKET_STATE_UPDATE ,TICKET_UPDATE ,TICKET_DELETE ,TICKET_CLOSE]
-    QUEUE_SALES_MANAGER_EVENTS = [OPPORTUNITY_CREATE ,OPPORTUNITY_STATE_UPDATE ,OPPORTUNITY_RESOLVE,OPPORTUNITY_UPDATE,OPPORTUNITY_LOST,OPPORTUNITY_DELETE]
+# Define the lists after the Enum is created
+QUEUE_TECH_SUPPORT_EVENTS = [EventType.TICKET_CREATE, EventType.TICKET_STATE_UPDATE, EventType.TICKET_UPDATE, EventType.TICKET_DELETE, EventType.TICKET_CLOSE]
+QUEUE_SALES_MANAGER_EVENTS = [EventType.OPPORTUNITY_CREATE, EventType.OPPORTUNITY_STATE_UPDATE, EventType.OPPORTUNITY_RESOLVE, EventType.OPPORTUNITY_UPDATE, EventType.OPPORTUNITY_LOST, EventType.OPPORTUNITY_DELETE]
 
 # Communication Type Constants
 class CommunicationType(Enum):

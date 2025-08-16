@@ -3,7 +3,7 @@ from langchain.prompts import PromptTemplate
 from config import llm, HUMAN_SUPPORT_EMAIL
 from tools.sales_tools import sales_tool_list
 from graph.agents_factory import create_agent
-from event_types import EventType, Status, CommunicationType
+from event_types import EventType, Status, CommunicationType , QUEUE_SALES_MANAGER_EVENTS
 from tools.tech_tools import send_email_to_customer # Import the email tool here for the prompt
 
 tools = sales_tool_list
@@ -23,7 +23,7 @@ sales_system_prompt = (
     "IMPORTANT: You handle TWO types of communication:\n\n"
     
     "1. ASYNC QUEUE (from CRM via Redis):\n"
-    f" - You receive one of the following event types: {', '.join(EventType.QUEUE_SALES_MANAGER_EVENTS)} \n"
+    f" - You receive one of the following event types: {', '.join([event.value for event in QUEUE_SALES_MANAGER_EVENTS])} \n"
     " - Use the 'process_new_opportunity' tool to analyze and prepare the data for further actions, like scheduling a follow-up or sending an introductory email.\n"
     " - Note: The initial 'opportunity created' confirmation email is handled automatically by the system. You are responsible for all follow-up communication.\n\n"
     
