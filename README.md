@@ -1,8 +1,8 @@
-# 🤖 Multi-Agent CRM System
+# Multi-Agent CRM System
 
 ![Project Architecture](assets/diagramme_globale1.png)
 
-## 📖 Overview
+## Overview
 
 This project is a sophisticated **Multi-Agent System** designed to assist businesses in managing customer relationships, sales processes, and technical support. Built using **LangChain** and **LangGraph**, it orchestrates specialized AI agents to handle complex user queries and integrate seamlessly with a CRM database.
 
@@ -11,7 +11,7 @@ The core of the system is a **Supervisor Agent** that intelligently routes reque
 - **Technical Support**: Manages tickets, resolution estimates, and status checks.
 - **Customer Support**: Provides general assistance and status updates.
 
-## 🚀 Key Features
+## Key Features
 
 - **Intelligent Routing**: A Supervisor agent (LLM router) analyzes user intent and directs tasks to the most suitable specialized agent.
 - **Stateful Conversation**: Built on `LangGraph`, ensuring context is maintained throughout the interaction.
@@ -19,7 +19,7 @@ The core of the system is a **Supervisor Agent** that intelligently routes reque
 - **Specialized Toolsets**: Each agent is equipped with specific tools (e.g., `opportunity_state`, `ticket_state`, `create_appointment`) to perform concrete actions.
 - **Observability**: Integrated with **LangSmith** for full tracing and debugging of agent interactions.
 
-## 🏗️ Architecture
+## Architecture
 
 The system follows a star-graph architecture where the **Supervisor** acts as the central hub.
 
@@ -34,7 +34,7 @@ The system follows a star-graph architecture where the **Supervisor** acts as th
 3. **Agent Execution**: The selected agent (e.g., Sales) executes its logic, potentially calling tools (DB queries), and returns the result to the Supervisor.
 4. **Loop**: The process repeats until the request is satisfied.
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Framework**: [LangChain](https://www.langchain.com/) & [LangGraph](https://python.langchain.com/docs/langgraph)
 - **LLM**: OpenAI GPT-3.5 Turbo / GPT-4
@@ -42,7 +42,7 @@ The system follows a star-graph architecture where the **Supervisor** acts as th
 - **API**: FastAPI (optional integration)
 - **Tracing**: LangSmith
 
-## ⚙️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Python 3.10+
@@ -80,7 +80,7 @@ LANGCHAIN_PROJECT=Multi-Agent-CRM
 ### 5. Database Setup
 Ensure your PostgreSQL database is running and has the necessary tables (`status`, `tickets`, `opportunities`). The `databse.py` (database module) handles connections using the `DATABASE_URL`.
 
-## 🏃 Usage
+## Usage
 
 You can run the main entry point to test the multi-agent graph in the console.
 
@@ -117,15 +117,3 @@ multi-agent/
 ├── databse.py          # Database interactions
 └── requirements.txt    # Project dependencies
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/NewFeature`).
-3. Commit your changes.
-4. Push to the branch.
-5. Open a Pull Request.
-
----
-*Built with ❤️ by AI Agent Enthusiasts*
